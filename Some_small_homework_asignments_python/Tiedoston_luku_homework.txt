@@ -1,0 +1,114 @@
+ROUTERS = {}
+
+class Router:
+
+    def __init__(self, router_name):
+        self.__router_name = router_name
+        self.__neighbour = []
+        self.__router_map = []
+
+    def print_info(self):
+        neighbour_txt = str()
+        for neighbour in self.__neighbour:
+            neighbour_txt = neighbour_txt + str(neighbour)
+            if neighbour == self.__neighbour[len(self.__neighbour)-1]:
+                break
+            else:
+                neighbour_txt = neighbour_txt + str(", ")
+
+        router_txt = str()
+
+        for network_element in self.__router_map:
+            router_txt = router_txt + str(network_element)
+            if network_element == self.__router_map[len(self.__router_map)-1]:
+                break
+            else:
+                router_txt = router_txt + str(", ")
+        print(self.__router_name)
+        print("  N: " + neighbour_txt)
+        print("  R: " + router_txt)
+
+    def add_neighbour(self, *arg):
+        self.__neighbour.append(*arg)
+
+    def add_network(self, network, distance):
+        network_info = network + ":" + str(distance)
+        self.__router_map.append(network_info)
+
+def check_if_router_exists(router_name):
+    if router_name in ROUTERS:
+        return True
+    else:
+        return False
+
+def main():
+
+    routerfile = input("Network file: ")
+
+
+    while True:
+        command = input("> ")
+        command = command.upper()
+
+        if command == "P":
+            router_name = str(input("Enter router name: "))
+
+            if check_if_router_exists(router_name) is True:
+                ROUTERS[router_name].print_info()
+            else:
+                print("Router was not found.")
+
+        elif command == "PA":
+            for router in sorted(ROUTERS):
+                ROUTERS[router].print_info()
+
+        elif command == "S":
+            pass
+
+        elif command == "C": 
+            first_router_name = str(input("Enter 1st router: "))
+            second_router_name = str(input("Enter 2nd router: "))
+
+            if check_if_router_exists(first_router_name) is True and check_if_router_exists(second_router_name) is True:
+                ROUTERS[first_router_name].add_neighbour(second_router_name)
+                ROUTERS[second_router_name].add_neighbour(first_router_name)
+            else:
+                print("Router was not found.")
+
+        elif command == "RR":
+            pass
+
+        elif command == "NR":
+            router_name = str(input("Enter a new name: "))
+            if check_if_router_exists(router_name) is True:
+                print("Name is taken.")
+            else:
+                ROUTERS[router_name] = Router(router_name)
+
+        elif command == "NN":
+            router_name = str(input("Enter router name: "))
+            network = str(input("Enter network: "))
+            distance = int(input("Enter distance: "))
+
+            if check_if_router_exists(router_name) is True:
+                ROUTERS[router_name].add_network(network,distance)
+            else:
+                print("Router was not found.")
+
+        elif command == "Q":
+            print("Simulator closes.")
+            return
+
+        else:
+            print("Erroneous command!")
+            print("Enter one of these commands:")
+            print("NR (new router)")
+            print("P (print)")  
+            print("C (connect)")
+            print("NN (new network)")
+            print("PA (print all)")
+            print("S (send routing tables)")
+            print("RR (route request)")
+            print("Q (quit)")
+
+main()

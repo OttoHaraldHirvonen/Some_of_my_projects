@@ -1,0 +1,83 @@
+def saveTodict(fileName,payments):
+    textFile = open(fileName,"r")
+
+    for line in textFile:
+        lineElems = line.rstrip().split(":")
+        if checkLine(lineElems) is False:
+            textFile.close()
+            return False
+        else:
+            if lineElems[0] not in payments:
+                payments[lineElems[0]] = [lineElems[1]]
+            else:
+                payments[lineElems[0]].append(lineElems[1])
+    textFile.close()
+    return payments
+
+def checkLine(lineElems):
+    try:
+        number = float(lineElems[1])
+    except (ValueError,IndexError) as error:
+        print("Error: there was an erroneous line in the file.")
+        return False
+    return True
+
+def countTotalCost(payments):
+    totalCost = 0
+    for i in payments:
+        for j in payments[i]:
+            totalCost = totalCost + float(j)
+    return format(totalCost,'.2f')
+def whatToDo(paymentOfPerson,totalCost,payments,i):
+    paymentDiff = float(format(float(paymentOfPerson) - (float(totalCost) / len(payments)), '.2f'))
+    paymentDiff2 = format(paymentDiff,'.2f')
+    paymentDiff3 = format(paymentDiff * -1,'.2f')
+    if -0.05 <= paymentDiff <= 0.05:
+        print("No transfers needed.")
+        return
+    elif paymentDiff > 0:
+        print(i + " needs to receive " + str(paymentDiff2)+"e.")
+        return
+    else:
+        print(i +" needs to pay " + str(paymentDiff3)+"e.")
+        return
+def main():
+    payments = {
+
+    }
+    fileName = input("Enter the name of the file: ")
+
+    try:
+        textFile = open(fileName,"r")
+        textFile.close()
+    except OSError:
+        print("Error: file "+fileName+" cannot be read.")
+        return
+
+    payments = saveTodict(fileName,payments)
+    if payments is False:
+        return
+    totalCost = countTotalCost(payments)
+
+    print("Total costs: " + str(totalCost)+"e")
+    print()
+
+    paymentOrder = ""
+    paymentOfPerson = 0
+    counter = 1
+    for i in payments:
+        for j in payments[i]:
+            if len(payments[i]) == counter:
+                paymentOrder = paymentOrder + str(format(float(j), '.2f'))
+            else:
+                paymentOrder = paymentOrder + str(format(float(j),'.2f')) + "," + " "
+            paymentOfPerson = format(float(paymentOfPerson) + float(j),'.2f')
+            counter += 1
+        print(i + " has paid "+ str(paymentOfPerson) +" in the following amounts: "+paymentOrder)
+        whatToDo(paymentOfPerson,totalCost,payments,i)
+        paymentOrder = ""
+        paymentOfPerson = 0
+        counter = 1
+        print()
+
+main()
